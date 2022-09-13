@@ -1,21 +1,56 @@
-/** Node.js 내장 모듈 사용
- * express : node.js의 대표적인 웹프레임워크 (모듈)
- * require() : 자바나 파이썬의 import 문이나 C계열의 include 처럼
-                외부의 기능을 사용하기 위해서 모듈을 가져오는 것
-* 모듈 : 파일을 읽거나 저장하는 기능을 구현할 수 있도록 돕는다
-        메서드 목록을 보면 파일을 읽을 때에 쓸법한 메서드 이름을 찾을 수 있다
-*/ 
-
-const express = require("express"); 
+const express = require("express");
 const app = express();
+const cors = require("cors");
 
-// 요청을 처리, '/' 경로로 접속하면 send 메세지를 출력해주는 서버를 만듦
-app.get("/", function(req, res){
-    res.send('Node.js');
+app.use(cors());
+
+// DB 흉내를 내기 위한 적용
+const DB = {
+  todo: [],
+};
+
+app.listen(3000, function () {
+  // 서버 시작
+  console.log("Hello Node.js 시작합니다.");
 });
 
-// 원하는 포트에 서버를 오픈하는 문법
-// 인자 값에 서버 오픈할 오픈번호, function(서버 오픈시 실행할 코드) 작성
-app.listen(3000, function(){
-    console.log('Hello Node.js');
-}); 
+app.get("/", function (req, res) {
+  //
+  res.send("Hello Node.js 시작!");
+});
+
+app.get("/delete", function (req, res) {
+  // 배열에서 특정 값 삭제
+  const index = req.query.index;
+
+  console.log("삭제 전 >> ", DB.todo);
+
+  DB.todo.splice(index, 1);
+
+  console.log("삭제 후 >> ", DB.todo);
+  res.send({});
+});
+
+app.get("/deleteTodo", function (req, res) {
+  // CLEAR 삭제 버튼 구현
+  DB.todo = []; // 배열에 있는거 다 삭제 하기
+  res.send({
+    code: "success",
+    msg: "성공적으로 저장되었습니다.",
+  });
+});
+
+app.get("/getTodos", function (req, res) {
+  res.send(DB.todo);
+});
+
+app.get("/addTodo", function (req, res) {
+  const todo = req.query.todo;
+  // DB.todo.push(todo); // push 배열 사용 문법(뒤로 쌓이기)
+  DB.todo.unshift(todo); // push 배열 사용 문법(앞으로 쌓이기)
+  res.send({
+    //index.js → $.ajax({}) 함수 → success: function (response) 로 넘겨줌
+    code: "success",
+    msg: "성공적으로 저장되었습니다.",
+  });
+});
